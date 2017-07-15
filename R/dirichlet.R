@@ -66,14 +66,14 @@ NULL
 #' @rdname dirichlet
 #' @export
 ddirichlet <- function(x, alpha, log = FALSE) {
-  if (is.matrix(x)) return( apply(x, 1, ddirichlet) )
+  if (is.matrix(x)) return( apply(x, 1, ddirichlet,alpha=alpha,log=log) )
   if( any(x < 0)  ) return(0L)
   tol <- .Machine$double.eps
   if( abs(sum(x) - 1) > tol ) return(0L)
   stopifnot(length(x) == length(alpha))
   log_f <- sum((alpha - 1)*log(x)) + lgamma(sum(alpha)) - sum(lgamma(alpha))
   if(log) return(log_f)
-  exp(log_f)
+  return(exp(log_f))
 }
 
 
@@ -87,6 +87,7 @@ ddirichlet <- function(x, alpha, log = FALSE) {
 rdirichlet <- function(n, alpha) {
   normalize <- function(.) . / sum(.)
   samps <- vapply(alpha, function(al) rgamma(n, al, 1), numeric(n))
+  if(n == 1) samps <- t(samps)
   t(apply(samps, 1, normalize))
 }
 
